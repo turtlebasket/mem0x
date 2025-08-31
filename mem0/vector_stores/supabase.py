@@ -47,7 +47,10 @@ class Supabase(VectorStoreBase):
         self.index_measure = index_measure
 
         collections = self.list_cols()
-        if collection_name not in collections:
+
+        if collection_name in collections:
+            self.collection = self.db.get_or_create_collection(name=self.collection_name, dimension=self.embedding_model_dims)
+        else:
             self.create_col(embedding_model_dims)
 
     def _preprocess_filters(self, filters: Optional[dict] = None) -> Optional[dict]:
@@ -183,12 +186,12 @@ class Supabase(VectorStoreBase):
 
     def list_cols(self) -> List[str]:
         """
-        List all collections.
+        List names of all collections.
 
         Returns:
             List[str]: List of collection names
         """
-        return self.db.list_collections()
+        return list(map(lambda x: x.name, self.db.list_collections()))
 
     def delete_col(self):
         """Delete the collection."""
