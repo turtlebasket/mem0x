@@ -4,14 +4,11 @@
 
 class AnonymousTelemetry:
     """Stub telemetry class that does nothing to prevent resource leaks."""
-    
+
     def __init__(self, vector_store=None):
         pass
-    
+
     def capture_event(self, event_name, properties=None, user_email=None):
-        pass
-    
-    def close(self):
         pass
 
 

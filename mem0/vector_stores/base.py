@@ -56,7 +56,3 @@ class VectorStoreBase(ABC):
     def reset(self):
         """Reset by delete the collection and recreate it."""
         pass
-
-    def close(self):
-        """Close the database connection to prevent resource leaks."""
-        pass

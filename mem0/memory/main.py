@@ -960,36 +960,6 @@ class Memory(MemoryBase):
             )
         capture_event("mem0.reset", self, {"sync_type": "sync"})
 
-    def close(self):
-        """Clean up all resources to prevent memory and thread leaks."""
-        # Close vector store if it has a close method
-        if hasattr(self.vector_store, "close"):
-            self.vector_store.close()
-
-        # Close LLM if it has a close method
-        if hasattr(self.llm, "close"):
-            self.llm.close()
-
-        # Close embedding model if it has a close method
-        if hasattr(self.embedding_model, "close"):
-            self.embedding_model.close()
-
-        # Close graph store if it has a close method
-        if self.graph and hasattr(self.graph, "close"):
-            self.graph.close()
-
-        # Close database connection
-        if hasattr(self.db, "close"):
-            self.db.close()
-
-    def __enter__(self):
-        """Context manager entry."""
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """Context manager exit with cleanup."""
-        self.close()
-
     def chat(self, query):
         raise NotImplementedError("Chat function not implemented yet.")
 
@@ -1874,36 +1844,6 @@ class AsyncMemory(MemoryBase):
             self.config.vector_store.provider, self.config.vector_store.config
         )
         capture_event("mem0.reset", self, {"sync_type": "async"})
-
-    async def close(self):
-        """Clean up all resources to prevent memory and thread leaks."""
-        # Close vector store if it has a close method
-        if hasattr(self.vector_store, "close"):
-            await asyncio.to_thread(self.vector_store.close)
-
-        # Close LLM if it has a close method
-        if hasattr(self.llm, "close"):
-            await asyncio.to_thread(self.llm.close)
-
-        # Close embedding model if it has a close method
-        if hasattr(self.embedding_model, "close"):
-            await asyncio.to_thread(self.embedding_model.close)
-
-        # Close graph store if it has a close method
-        if self.graph and hasattr(self.graph, "close"):
-            await asyncio.to_thread(self.graph.close)
-
-        # Close database connection
-        if hasattr(self.db, "close"):
-            await asyncio.to_thread(self.db.close)
-
-    async def __aenter__(self):
-        """Async context manager entry."""
-        return self
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Async context manager exit with cleanup."""
-        await self.close()
 
     async def chat(self, query):
         raise NotImplementedError("Chat function not implemented yet.")
