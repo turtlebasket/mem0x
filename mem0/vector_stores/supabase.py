@@ -40,17 +40,14 @@ class Supabase(VectorStoreBase):
             index_method (IndexMethod): Index method to use. Defaults to AUTO.
             index_measure (IndexMeasure): Distance measure to use. Defaults to COSINE.
         """
-        self.db = vecs.create_client(connection_string)
+        self.connection_string = connection_string
         self.collection_name = collection_name
         self.embedding_model_dims = embedding_model_dims
         self.index_method = index_method
         self.index_measure = index_measure
 
         collections = self.list_cols()
-
-        if collection_name in collections:
-            self.collection = self.db.get_or_create_collection(name=self.collection_name, dimension=self.embedding_model_dims)
-        else:
+        if collection_name not in collections:
             self.create_col(embedding_model_dims)
 
     def _preprocess_filters(self, filters: Optional[dict] = None) -> Optional[dict]:
@@ -89,8 +86,9 @@ class Supabase(VectorStoreBase):
 
         logger.info(f"Creating new collection: {self.collection_name}")
         try:
-            self.collection = self.db.get_or_create_collection(name=self.collection_name, dimension=dims)
-            self.collection.create_index(method=self.index_method.value, measure=self.index_measure.value)
+            with vecs.create_client(self.connection_string) as client:
+                collection = client.get_or_create_collection(name=self.collection_name, dimension=dims)
+                collection.create_index(method=self.index_method.value, measure=self.index_measure.value)
             logger.info(f"Successfully created collection {self.collection_name} with dimension {dims}")
         except Exception as e:
             logger.error(f"Failed to create collection: {str(e)}")
@@ -116,7 +114,9 @@ class Supabase(VectorStoreBase):
 
         records = [(id, vector, payload) for id, vector, payload in zip(ids, vectors, payloads)]
 
-        self.collection.upsert(records)
+        with vecs.create_client(self.connection_string) as client:
+            collection = client.get_or_create_collection(name=self.collection_name, dimension=self.embedding_model_dims)
+            collection.upsert(records)
 
     def search(
         self, query: str, vectors: List[float], limit: int = 5, filters: Optional[dict] = None
@@ -134,9 +134,12 @@ class Supabase(VectorStoreBase):
             List[OutputData]: Search results
         """
         filters = self._preprocess_filters(filters)
-        results = self.collection.query(
-            data=vectors, limit=limit, filters=filters, include_metadata=True, include_value=True
-        )
+
+        with vecs.create_client(self.connection_string) as client:
+            collection = client.get_or_create_collection(name=self.collection_name, dimension=self.embedding_model_dims)
+            results = collection.query(
+                data=vectors, limit=limit, filters=filters, include_metadata=True, include_value=True
+            )
 
         return [OutputData(id=str(result[0]), score=float(result[1]), payload=result[2]) for result in results]
 
@@ -147,7 +150,9 @@ class Supabase(VectorStoreBase):
         Args:
             vector_id (str): ID of the vector to delete
         """
-        self.collection.delete([(vector_id,)])
+        with vecs.create_client(self.connection_string) as client:
+            collection = client.get_or_create_collection(name=self.collection_name, dimension=self.embedding_model_dims)
+            collection.delete([(vector_id,)])
 
     def update(self, vector_id: str, vector: Optional[List[float]] = None, payload: Optional[dict] = None):
         """
@@ -165,7 +170,11 @@ class Supabase(VectorStoreBase):
                 vector = existing.payload.get("vector", [])
 
         if vector:
-            self.collection.upsert([(vector_id, vector, payload or {})])
+            with vecs.create_client(self.connection_string) as client:
+                collection = client.get_or_create_collection(
+                    name=self.collection_name, dimension=self.embedding_model_dims
+                )
+                collection.upsert([(vector_id, vector, payload or {})])
 
     def get(self, vector_id: str) -> Optional[OutputData]:
         """
@@ -177,7 +186,10 @@ class Supabase(VectorStoreBase):
         Returns:
             Optional[OutputData]: Retrieved vector data or None if not found
         """
-        result = self.collection.fetch([(vector_id,)])
+        with vecs.create_client(self.connection_string) as client:
+            collection = client.get_or_create_collection(name=self.collection_name, dimension=self.embedding_model_dims)
+            result = collection.fetch([(vector_id,)])
+
         if not result:
             return []
 
@@ -191,11 +203,13 @@ class Supabase(VectorStoreBase):
         Returns:
             List[str]: List of collection names
         """
-        return list(map(lambda x: x.name, self.db.list_collections()))
+        with vecs.create_client(self.connection_string) as client:
+            return list(map(lambda x: x.name, client.list_collections()))
 
     def delete_col(self):
         """Delete the collection."""
-        self.db.delete_collection(self.collection_name)
+        with vecs.create_client(self.connection_string) as client:
+            client.delete_collection(self.collection_name)
 
     def col_info(self) -> dict:
         """
@@ -204,7 +218,10 @@ class Supabase(VectorStoreBase):
         Returns:
             Dict: Collection information including name and configuration
         """
-        info = self.collection.describe()
+        with vecs.create_client(self.connection_string) as client:
+            collection = client.get_or_create_collection(name=self.collection_name, dimension=self.embedding_model_dims)
+            info = collection.describe()
+
         return {
             "name": info.name,
             "count": info.vectors,
@@ -225,32 +242,19 @@ class Supabase(VectorStoreBase):
         """
         filters = self._preprocess_filters(filters)
         query = [0] * self.embedding_model_dims
-        ids = self.collection.query(
-            data=query, limit=limit, filters=filters, include_metadata=True, include_value=False
-        )
-        ids = [id[0] for id in ids]
-        records = self.collection.fetch(ids=ids)
+
+        with vecs.create_client(self.connection_string) as client:
+            collection = client.get_or_create_collection(name=self.collection_name, dimension=self.embedding_model_dims)
+            ids = collection.query(data=query, limit=limit, filters=filters, include_metadata=True, include_value=False)
+            ids = [id[0] for id in ids]
+            records = collection.fetch(ids=ids)
 
         return [[OutputData(id=str(record[0]), score=None, payload=record[2]) for record in records]]
-
-    def close(self):
-        """Close the database connection to prevent resource leaks."""
-        if hasattr(self, 'db') and self.db:
-            try:
-                # Close the vecs client connection
-                if hasattr(self.db, 'close'):
-                    self.db.close()
-                elif hasattr(self.db, '_client') and hasattr(self.db._client, 'close'):
-                    # Some vecs implementations may store the connection in _client
-                    self.db._client.close()
-                logger.info(f"Closed Supabase connection for collection {self.collection_name}")
-            except Exception as e:
-                logger.warning(f"Error closing Supabase connection: {e}")
-            finally:
-                self.db = None
 
     def reset(self):
         """Reset the index by deleting and recreating it."""
         logger.warning(f"Resetting index {self.collection_name}...")
-        self.delete_col()
-        self.create_col(self.embedding_model_dims)
+        with vecs.create_client(self.connection_string) as client:
+            client.delete_collection(self.collection_name)
+            collection = client.get_or_create_collection(name=self.collection_name, dimension=self.embedding_model_dims)
+            collection.create_index(method=self.index_method.value, measure=self.index_measure.value)
