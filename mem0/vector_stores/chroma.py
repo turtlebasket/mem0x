@@ -234,10 +234,10 @@ class ChromaDB(VectorStoreBase):
     def _generate_where_clause(where: dict[str, any]) -> dict[str, any]:
         """
         Generate a properly formatted where clause for ChromaDB.
-        
+
         Args:
             where (dict[str, any]): The filter conditions.
-            
+
         Returns:
             dict[str, any]: Properly formatted where clause for ChromaDB.
         """

@@ -265,15 +265,15 @@ class MemoryClient:
     ) -> Dict[str, Any]:
         """
         Update a memory by ID.
-        
+
         Args:
             memory_id (str): Memory ID.
             text (str, optional): New content to update the memory with.
             metadata (dict, optional): Metadata to update in the memory.
-            
+
         Returns:
             Dict[str, Any]: The response from the server.
-            
+
         Example:
             >>> client.update(memory_id="mem_123", text="Likes to play tennis on weekends")
         """
@@ -1060,15 +1060,15 @@ class AsyncMemoryClient:
     ) -> Dict[str, Any]:
         """
         Update a memory by ID asynchronously.
-        
+
         Args:
             memory_id (str): Memory ID.
             text (str, optional): New content to update the memory with.
             metadata (dict, optional): Metadata to update in the memory.
-            
+
         Returns:
             Dict[str, Any]: The response from the server.
-            
+
         Example:
             >>> await client.update(memory_id="mem_123", text="Likes to play tennis on weekends")
         """

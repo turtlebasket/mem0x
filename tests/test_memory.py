@@ -66,11 +66,13 @@ def test_list_memories(memory_client):
     assert data2 in memories
 
 
-@patch('mem0.utils.factory.EmbedderFactory.create')
-@patch('mem0.utils.factory.VectorStoreFactory.create')
-@patch('mem0.utils.factory.LlmFactory.create')
-@patch('mem0.memory.storage.SQLiteManager')
-def test_collection_name_preserved_after_reset(mock_sqlite, mock_llm_factory, mock_vector_factory, mock_embedder_factory):
+@patch("mem0.utils.factory.EmbedderFactory.create")
+@patch("mem0.utils.factory.VectorStoreFactory.create")
+@patch("mem0.utils.factory.LlmFactory.create")
+@patch("mem0.memory.storage.SQLiteManager")
+def test_collection_name_preserved_after_reset(
+    mock_sqlite, mock_llm_factory, mock_vector_factory, mock_embedder_factory
+):
     mock_embedder_factory.return_value = MagicMock()
     mock_vector_store = MagicMock()
     mock_vector_factory.return_value = mock_vector_store
@@ -93,5 +95,7 @@ def test_collection_name_preserved_after_reset(mock_sqlite, mock_llm_factory, mo
 
     reset_calls = [call for call in mock_vector_factory.call_args_list if len(mock_vector_factory.call_args_list) > 2]
     if reset_calls:
-        reset_config = reset_calls[-1][0][1]  
-        assert reset_config.collection_name == test_collection_name, f"Reset used wrong collection name: {reset_config.collection_name}"
+        reset_config = reset_calls[-1][0][1]
+        assert (
+            reset_config.collection_name == test_collection_name
+        ), f"Reset used wrong collection name: {reset_config.collection_name}"
