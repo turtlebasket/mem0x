@@ -233,6 +233,22 @@ class Supabase(VectorStoreBase):
 
         return [[OutputData(id=str(record[0]), score=None, payload=record[2]) for record in records]]
 
+    def close(self):
+        """Close the database connection to prevent resource leaks."""
+        if hasattr(self, 'db') and self.db:
+            try:
+                # Close the vecs client connection
+                if hasattr(self.db, 'close'):
+                    self.db.close()
+                elif hasattr(self.db, '_client') and hasattr(self.db._client, 'close'):
+                    # Some vecs implementations may store the connection in _client
+                    self.db._client.close()
+                logger.info(f"Closed Supabase connection for collection {self.collection_name}")
+            except Exception as e:
+                logger.warning(f"Error closing Supabase connection: {e}")
+            finally:
+                self.db = None
+
     def reset(self):
         """Reset the index by deleting and recreating it."""
         logger.warning(f"Resetting index {self.collection_name}...")
