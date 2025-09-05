@@ -65,7 +65,7 @@ def parse_content(content, type):
     cleaned_size = len(content)
     if original_size != 0:
         logger.info(
-            f"Cleaned page size: {cleaned_size} characters, down from {original_size} (shrunk: {original_size-cleaned_size} chars, {round((1-(cleaned_size/original_size)) * 100, 2)}%)"  # noqa:E501
+            f"Cleaned page size: {cleaned_size} characters, down from {original_size} (shrunk: {original_size - cleaned_size} chars, {round((1 - (cleaned_size / original_size)) * 100, 2)}%)"  # noqa:E501
         )
 
     return content

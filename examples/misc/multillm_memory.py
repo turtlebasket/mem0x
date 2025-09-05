@@ -76,7 +76,7 @@ def research_with_specialist(task: str, specialist: str, project_id: str) -> str
     # Specialist role and model
     spec_info = RESEARCH_TEAM[specialist]
 
-    system_prompt = f"""You are the {spec_info['role']}.
+    system_prompt = f"""You are the {spec_info["role"]}.
 
 {team_knowledge}
 

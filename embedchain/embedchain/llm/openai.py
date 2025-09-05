@@ -69,7 +69,7 @@ class OpenAILlm(BaseLlm):
             warnings.warn(
                 "The environment variable 'OPENAI_API_BASE' is deprecated and will be removed in the 0.1.140. "
                 "Please use 'OPENAI_BASE_URL' instead.",
-                DeprecationWarning
+                DeprecationWarning,
             )
 
         if config.top_p:

@@ -79,7 +79,9 @@ async def answer_query(message):
     await thread.send("🎭 Putting on my thinking cap, brb with an epic response!")
     response = NEXTJS_BOT.query(question, citations=True)
 
-    default_answer = "Sorry, I don't know the answer to that question. Please refer to the documentation.\nhttps://nextjs.org/docs"  # noqa: E501
+    default_answer = (
+        "Sorry, I don't know the answer to that question. Please refer to the documentation.\nhttps://nextjs.org/docs"  # noqa: E501
+    )
     answer = response.get("answer", default_answer)
 
     contexts = response.get("contexts", [])

@@ -96,6 +96,6 @@ def test_collection_name_preserved_after_reset(
     reset_calls = [call for call in mock_vector_factory.call_args_list if len(mock_vector_factory.call_args_list) > 2]
     if reset_calls:
         reset_config = reset_calls[-1][0][1]
-        assert (
-            reset_config.collection_name == test_collection_name
-        ), f"Reset used wrong collection name: {reset_config.collection_name}"
+        assert reset_config.collection_name == test_collection_name, (
+            f"Reset used wrong collection name: {reset_config.collection_name}"
+        )

@@ -1,9 +1,10 @@
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
-from databricks.sdk.service.vectorsearch import VectorIndexType
-from mem0.vector_stores.databricks import Databricks
-import pytest
 
+import pytest
+from databricks.sdk.service.vectorsearch import VectorIndexType
+
+from mem0.vector_stores.databricks import Databricks
 
 # ---------------------- Fixtures ---------------------- #
 

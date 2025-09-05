@@ -131,9 +131,9 @@ class GmailLoader(BaseLoader):
         content = clean_string(content)
         return dedent(
             f"""
-            Email from '{email['from']}' to '{email['to']}'
-            Subject: {email['subject']}
-            Date: {email['date']}
+            Email from '{email["from"]}' to '{email["to"]}'
+            Subject: {email["subject"]}
+            Date: {email["date"]}
             Content: {content}
         """
         )

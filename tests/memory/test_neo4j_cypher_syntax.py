@@ -64,14 +64,14 @@ class TestNeo4jCypherSyntaxFix:
                 # Check if there's a MATCH clause before this that defines 'm'
                 preceding_lines = lines[max(0, i - 10) : i]
                 match_found = any("MATCH" in prev_line and " m " in prev_line for prev_line in preceding_lines)
-                assert match_found, f"Line {i+1}: WHERE clause references 'm' without MATCH definition"
+                assert match_found, f"Line {i + 1}: WHERE clause references 'm' without MATCH definition"
 
             # Also check for run_id patterns that might have similar issues
             if "WHERE" in line and "m.run_id" in line:
                 # Check if there's a MATCH clause before this that defines 'm'
                 preceding_lines = lines[max(0, i - 10) : i]
                 match_found = any("MATCH" in prev_line and " m " in prev_line for prev_line in preceding_lines)
-                assert match_found, f"Line {i+1}: WHERE clause references 'm.run_id' without MATCH definition"
+                assert match_found, f"Line {i + 1}: WHERE clause references 'm.run_id' without MATCH definition"
 
     def test_agent_id_integration_syntax(self):
         """Test that agent_id is properly integrated into MATCH clauses"""

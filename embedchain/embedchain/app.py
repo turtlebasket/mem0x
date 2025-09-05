@@ -7,6 +7,7 @@ from typing import Any, Optional, Union
 
 import requests
 import yaml
+from mem0 import Memory
 from tqdm import tqdm
 
 from embedchain.cache import (
@@ -39,7 +40,6 @@ from embedchain.utils.evaluation import EvalData, EvalMetric
 from embedchain.utils.misc import validate_config
 from embedchain.vectordb.base import BaseVectorDB
 from embedchain.vectordb.chroma import ChromaDB
-from mem0 import Memory
 
 logger = logging.getLogger(__name__)
 

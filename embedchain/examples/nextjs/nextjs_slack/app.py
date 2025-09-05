@@ -79,7 +79,9 @@ def app_mention_handler(body, say, client):
     question = remove_mentions(query)
     print("Asking question: ", question)
     response = slack_bot.query(question, citations=True)
-    default_answer = "Sorry, I don't know the answer to that question. Please refer to the documentation.\nhttps://nextjs.org/docs"  # noqa: E501
+    default_answer = (
+        "Sorry, I don't know the answer to that question. Please refer to the documentation.\nhttps://nextjs.org/docs"  # noqa: E501
+    )
     answer = response.get("answer", default_answer)
     contexts = response.get("contexts", [])
     if contexts:

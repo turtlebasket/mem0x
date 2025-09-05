@@ -109,7 +109,7 @@ class DiscordLoader(BaseLoader):
                     channel = self.get_channel(int(channel_id))
                     if not isinstance(channel, discord.TextChannel):
                         raise ValueError(
-                            f"Channel {channel_id} is not a text channel. " "Only text channels are supported for now."
+                            f"Channel {channel_id} is not a text channel. Only text channels are supported for now."
                         )
                     threads = {}
 
