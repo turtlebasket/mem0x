@@ -1,5 +1,6 @@
 import hashlib
 import re
+from typing import Optional
 
 from mem0.configs.prompts import FACT_RETRIEVAL_PROMPT
 
@@ -32,7 +33,7 @@ def format_entities(entities):
     return "\n".join(formatted_lines)
 
 
-def remove_code_blocks(content: str) -> str:
+def remove_code_blocks(content: Optional[str]) -> str:
     """
     Removes enclosing code block markers ```[language] and ``` from a given string.
 
@@ -40,7 +41,10 @@ def remove_code_blocks(content: str) -> str:
     - The function uses a regex pattern to match code blocks that may start with ``` followed by an optional language tag (letters or numbers) and end with ```.
     - If a code block is detected, it returns only the inner content, stripping out the markers.
     - If no code block markers are found, the original content is returned as-is.
+    - If content is None, returns an empty string.
     """
+    if content is None:
+        return ""
     pattern = r"^```[a-zA-Z0-9]*\n([\s\S]*?)\n```$"
     match = re.match(pattern, content.strip())
     return match.group(1).strip() if match else content.strip()
