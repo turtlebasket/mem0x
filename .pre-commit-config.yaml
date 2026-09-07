@@ -6,7 +6,7 @@ ci: # NOTE: uses https://pre-commit.ci
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.12.12
+    rev: v0.16.6
     hooks:
       # Run the linter.
       - id: ruff-check
